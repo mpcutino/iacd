@@ -1,32 +1,32 @@
-# Ampliación de Inteligencia Artificial.
-# Grado en Ingeniería Informática - Tecnologías Informáticas
+# Ampliacion de Inteligencia Artificial.
+# Grado en Ingenieria Informatica - Tecnologias Informaticas
 # jugar_tenis.py
 # Ejemplo visto en clase (ver diapositivas)
 
 # atributos=[('Cielo',['Soleado','Nublado','Lluvia']),
 #            ('Temperatura',['Alta','Baja','Suave']),
 #            ('Humedad',['Alta','Normal']),
-#            ('Viento',['Débil','Fuerte'])]
+#            ('Viento',['Debil','Fuerte'])]
 
-# atributo_clasificación='Jugar Tenis'
+# atributo_clasificacion='Jugar Tenis'
 # clases=['si','no']
 
 import numpy as np
 
 
-X_tenis=np.array([['Soleado' , 'Alta'        , 'Alta'    , 'Débil'], 
+X_tenis=np.array([['Soleado' , 'Alta'        , 'Alta'    , 'Debil'], 
                   ['Soleado' , 'Alta'        , 'Alta'    , 'Fuerte'], 
-                  ['Nublado' , 'Alta'        , 'Alta'    , 'Débil'],  
-                  ['Lluvia'  , 'Suave'       , 'Alta'    , 'Débil'],  
-                  ['Lluvia'  , 'Baja'        , 'Normal'  , 'Débil' ], 
+                  ['Nublado' , 'Alta'        , 'Alta'    , 'Debil'],  
+                  ['Lluvia'  , 'Suave'       , 'Alta'    , 'Debil'],  
+                  ['Lluvia'  , 'Baja'        , 'Normal'  , 'Debil' ], 
                   ['Lluvia'  , 'Baja'        , 'Normal'  , 'Fuerte'], 
                   ['Nublado' , 'Baja'        , 'Normal'  , 'Fuerte'], 
-                  ['Soleado' , 'Suave'       , 'Alta'    , 'Débil'],  
-                  ['Soleado' , 'Baja'        , 'Normal'  , 'Débil'],  
-                  ['Lluvia'  , 'Suave'       , 'Normal'  , 'Débil'],  
+                  ['Soleado' , 'Suave'       , 'Alta'    , 'Debil'],  
+                  ['Soleado' , 'Baja'        , 'Normal'  , 'Debil'],  
+                  ['Lluvia'  , 'Suave'       , 'Normal'  , 'Debil'],  
                   ['Soleado' , 'Suave'       , 'Normal'  , 'Fuerte'], 
                   ['Nublado' , 'Suave'       , 'Alta'    , 'Fuerte'], 
-                  ['Nublado' , 'Alta'        , 'Normal'  , 'Débil'],  
+                  ['Nublado' , 'Alta'        , 'Normal'  , 'Debil'],  
                   ['Lluvia'  , 'Suave'       , 'Alta'    , 'Fuerte']])
 
 y_tenis=np.array(['no',
