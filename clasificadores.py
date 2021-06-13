@@ -280,8 +280,6 @@ def genera_conjunto_de_datos_c_l_s(rango,dim,n_datos,prop=0.1):
 
     return x, y.astype(np.int)
 
-x, y = genera_conjunto_de_datos_c_l_s(1, 1, 150)
-
 
 # ---------------------------------------------
 # II.2) Implementacion de un clasificador lineal
@@ -392,15 +390,21 @@ x, y = genera_conjunto_de_datos_c_l_s(1, 1, 150)
 # conjunto de datos). Probarlo con varios de estos conjuntos generados
 # aleatoriamente:
 
+from auxiliars.logistic_regresion import RegresionLogisticaMiniBatch
 # -------------------------------------------------------------
 # >>> X1,y1=genera_conjunto_de_datos_c_l_s(4,8,400)
+X1,y1 = genera_conjunto_de_datos_c_l_s(4,8,400)
 
 # El 25% para test:
 # >>> X1e,y1e=X1[:300],y1[:300]
 # >>> X1t,y1t=X1[300:],y1[300:]
+X1e,y1e=X1[:300],y1[:300]
+X1t,y1t=X1[300:],y1[300:]
 
 # >>> clas_pb1=RegresionLogisticaMiniBatch([0,1],rate=0.1, rate_decay=true)
 # >>> clas_pb1.entrena(X1e,y1e,10000)
+clas_pb1 = RegresionLogisticaMiniBatch([0,1], rate=0.1, rate_decay=True)
+clas_pb1.entrena(X1e,y1e,100)
 
 # Clasificamos un ejemplo de test, y lo comparamos con su clase real:
 # >>> clas_pb1.clasifica(X1t[0]),y1t[0]
