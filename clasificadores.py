@@ -99,6 +99,8 @@ from data.jugar_tenis import X_tenis, y_tenis
 
 # Ejemplo "jugar al tenis":
 
+print("\n ++ Play Tenis with Naive Bayes ++ \n")
+
 nb_tenis=NaiveBayes(k=0.5)
 nb_tenis.entrena(X_tenis,y_tenis)
 ej_tenis = np.array(['Soleado','Baja','Alta','Fuerte'])
@@ -403,8 +405,9 @@ X1t,y1t=X1[300:],y1[300:]
 
 # >>> clas_pb1=RegresionLogisticaMiniBatch([0,1],rate=0.1, rate_decay=true)
 # >>> clas_pb1.entrena(X1e,y1e,10000)
-clas_pb1 = RegresionLogisticaMiniBatch([0,1], rate=0.1, rate_decay=True)
-clas_pb1.entrena(X1e,y1e,100)
+clas_pb1 = RegresionLogisticaMiniBatch([0,1], rate=0.1, rate_decay=True, normalizacion=True)
+print("\n ++ Training on random data for Logistic Regresion ++ \n")
+clas_pb1.entrena(X1e, y1e, 100, bias=False)
 
 # Clasificamos un ejemplo de test, y lo comparamos con su clase real:
 # >>> clas_pb1.clasifica(X1t[0]),y1t[0]
@@ -425,13 +428,18 @@ clas_pb1.entrena(X1e,y1e,100)
 
 # >>> from sklearn.datasets import load_breast_cancer
 # >>> cancer=load_breast_cancer()
+print("\n ++ Training on breast cancer (sklearn) for Logistic Regresion ++ \n")
 
+from sklearn.datasets import load_breast_cancer
+cancer=load_breast_cancer()
 # >>> X_cancer,y_cancer=cancer.data,cancer.target
-
+X_cancer,y_cancer = cancer.data,cancer.target
+Xe_cancer, Xt_cancer, ye_cancer, yt_cancer = train_test_split(X_cancer, y_cancer, random_state=42, stratify=y_cancer)
 
 # >>> lr_cancer=RegresionLogisticaMiniBatch(rate=0.1,rate_decay=True,normalizacion=True)
-
+lr_cancer = RegresionLogisticaMiniBatch(rate=0.1,rate_decay=True,normalizacion=True)
 # >>> lr_cancer.entrena(Xe_cancer,ye_cancer,10000)
+lr_cancer.entrena(Xe_cancer, ye_cancer, 10000)
 
 # >>> rendimiento(lr_cancer,Xe_cancer,ye_cancer)
 # 0.9906103286384976
