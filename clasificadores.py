@@ -439,7 +439,7 @@ Xe_cancer, Xt_cancer, ye_cancer, yt_cancer = train_test_split(X_cancer, y_cancer
 # >>> lr_cancer=RegresionLogisticaMiniBatch(rate=0.1,rate_decay=True,normalizacion=True)
 lr_cancer = RegresionLogisticaMiniBatch(rate=0.1,rate_decay=True,normalizacion=True)
 # >>> lr_cancer.entrena(Xe_cancer,ye_cancer,10000)
-lr_cancer.entrena(Xe_cancer, ye_cancer, 10000)
+lr_cancer.entrena(Xe_cancer, ye_cancer, 10000, bias=False)
 
 # >>> rendimiento(lr_cancer,Xe_cancer,ye_cancer)
 # 0.9906103286384976
@@ -510,7 +510,9 @@ lr_cancer.entrena(Xe_cancer, ye_cancer, 10000)
 #  estructura, y que implemente un clasificador OvR usando como base el
 #  clasificador binario del apartado anterior.
 
+from auxiliars.one_vs_rest import RL_OvR
 
+from sklearn.datasets import load_iris
 # class RL_OvR():
 
 #     def __init__(self,clases,rate=0.1,rate_decay=False,batch_tam=64):
@@ -534,6 +536,15 @@ lr_cancer.entrena(Xe_cancer, ye_cancer, 10000)
 
 #  Un ejemplo de sesion, con el problema del iris:
 
+iris=load_iris()
+X_iris=iris.data
+y_iris=iris.target
+Xe_iris,Xt_iris,ye_iris,yt_iris = train_test_split(X_iris,y_iris)
+
+print("\n ++ Training One vs Rest ++ \n")
+
+rl_iris = RL_OvR([0,1,2], rate=0.001, batch_tam=20)
+rl_iris.entrena(Xe_iris,ye_iris,n_epochs=100)
 
 # --------------------------------------------------------------------
 # >>> from sklearn.datasets import load_iris
