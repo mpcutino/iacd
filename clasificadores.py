@@ -152,7 +152,7 @@ from sklearn.model_selection import train_test_split
 def my_cross_validation(clf, X, y, cv, sklearn_clf=False):
     scores = []
     for i in range(cv):
-        x_train, x_test, y_train, y_test = train_test_split(X, y, random_state=random.randint(1, 4*cv), stratify=y)
+        x_train, x_test, y_train, y_test = train_test_split(X, y, random_state=random.randint(1, 10000), stratify=y)
 
         train_func = clf.fit if sklearn_clf else clf.entrena
         train_func(x_train, y_train)
