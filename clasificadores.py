@@ -521,10 +521,10 @@ print(res)
 
 # Comprobamos el rendimiento sobre entrenamiento y prueba:
 res = rendimiento(clas_pb1,X1e,y1e)
-# print(res) 
+print(res) 
 # 0.8733333333333333
 res=rendimiento(clas_pb1,X1t,y1t)
-# print(res) 
+print(res) 
 # 0.83
 
 #%%
@@ -655,15 +655,16 @@ Xe_iris,Xt_iris,ye_iris,yt_iris = train_test_split(X_iris,y_iris)
 
 print("\n ++ Training One vs Rest ++ \n")
 
-rl_iris = RL_OvR([0,1,2], rate=0.001, batch_tam=20)
-rl_iris.entrena(Xe_iris,ye_iris,n_epochs=100)
+rl_iris = RL_OvR([0,1,2], rate=0.001, batch_tam=20, normalizacion=False)
+rl_iris.entrena(Xe_iris, ye_iris, n_epochs=1000)
 
+print(">>> Rendimiento en dataset iris (training, test) ")
 res = rendimiento(rl_iris,Xe_iris,ye_iris)
-# print(res)
+print(res)
 # 0.9732142857142857
 
 res =rendimiento(rl_iris,Xt_iris,yt_iris)
-# print(res)
+print(res)
 # >>> 0.9736842105263158
 #%%
 # --------------------------------------------------------------------
@@ -711,4 +712,71 @@ res =rendimiento(rl_iris,Xt_iris,yt_iris)
 # Ajustar los parametros de tamano de batch, tasa de aprendizaje y
 # rate_decay para tratar de obtener un rendimiento aceptable (por encima del
 # 75% de aciertos sobre test). 
+
+from auxiliars.utils import load_images, load_labels
+
+print("+++++++++++")
+print("DIGIT")
+print("+++++++++++")
+
+
+X_train = load_images("data/digitdata/trainingimages")
+y_train = load_labels("data/digitdata/traininglabels")
+
+X_valid = load_images("data/digitdata/validationimages")
+y_valid = load_labels("data/digitdata/validationlabels")
+
+X_test = load_images("data/digitdata/testimages")
+y_test = load_labels("data/digitdata/testlabels")
+
+
+print("\nTrain size")
+print(X_train.shape)
+print(y_train.shape)
+
+print("Validation size")
+print(X_valid.shape)
+print(y_valid.shape)
+
+print("Test size")
+print(X_test.shape)
+print(y_test.shape)
+print()
+
+def rl_ovr_grid_search(clases, params, train_tuple, validation_tuple, n_epochs=300):
+    print("Grid search for {0} epochs...".format(n_epochs))
+    best_params, best_score = {}, -1
+    for p in params:
+        clf = RL_OvR(clases, **p)
+        clf.entrena(train_tuple[0], train_tuple[1], n_epochs=n_epochs)
+        score = rendimiento(clf, validation_tuple[0], validation_tuple[1])
+        if score > best_score:
+            best_score = score
+            best_params = p
+    print("Best score {0} for params {1}".format(best_score, best_params))
+    return best_params
+
+
+params_ = [
+    {'rate': 0.001, 'batch_tam': 64, 'rate_decay': False},
+    {'rate': 0.001, 'batch_tam': 64, 'rate_decay': True},
+    {'rate': 0.01, 'batch_tam': 32, 'rate_decay': True},
+    {'rate': 0.001, 'batch_tam': 128, 'rate_decay': False},
+    {'rate': 0.1, 'batch_tam': 128, 'rate_decay': True},
+]
+clases_ = np.arange(1, 10, 1)
+
+best_p = rl_ovr_grid_search(clases_, params_, (X_train, y_train), (X_valid, y_valid), n_epochs=75)
+
+rl_digit = RL_OvR(clases_, **best_p)
+xe, ye = np.vstack([X_train, X_valid]), np.hstack([y_train, y_valid])
+
+print("\nTraining on full data (using both training and validation)")
+rl_digit.entrena(xe, ye, n_epochs=500)
+
+print("Rendimiento en dataset digit (training, test)")
+res = rendimiento(rl_digit, xe, ye)
+print(res)
+res = rendimiento(rl_digit, X_test, y_test)
+print(res)
 
