@@ -124,6 +124,7 @@ def rendimiento(clasificador, X, y, sklearn_clf=False):
     y = np.array(y)
 
     acc = (preds == y).sum()
+    
     return acc/len(y)
 
 # Ejemplo:
@@ -358,6 +359,7 @@ select_best_clf([x_train, x_test],[yimdb_train, yimdb_test],xy_raw=False)
 #   situe. Eso aseguraria que el conjunto de datos fuera linealmente
 #   separable. Por ultimo, cambiar de clase a una proporcion pequena (dada por
 #   el parametro prop) del total de ejemplos
+#%%
 from auxiliars.utils import plot_1Ddata
 
 
@@ -384,7 +386,7 @@ def genera_conjunto_de_datos_c_l_s(rango,dim,n_datos,prop=0.1):
         plot_1Ddata(m, x, hs, y, rango)
 
     return x, y.astype(np.int)
-
+#%%
 
 # ---------------------------------------------
 # II.2) Implementacion de un clasificador lineal
@@ -494,7 +496,7 @@ def genera_conjunto_de_datos_c_l_s(rango,dim,n_datos,prop=0.1):
 # Ejemplo de uso (usando la funcion del apartado anterior para generar el
 # conjunto de datos). Probarlo con varios de estos conjuntos generados
 # aleatoriamente:
-
+#%%
 from auxiliars.logistic_regresion import RegresionLogisticaMiniBatch
 # -------------------------------------------------------------
 # >>> X1,y1=genera_conjunto_de_datos_c_l_s(4,8,400)
@@ -513,16 +515,21 @@ print("\n ++ Training on random data for Logistic Regresion ++ \n")
 clas_pb1.entrena(X1e, y1e, 100, bias=False)
 
 # Clasificamos un ejemplo de test, y lo comparamos con su clase real:
-# >>> clas_pb1.clasifica(X1t[0]),y1t[0]
+res = clas_pb1.clasifica(X1t[0]),y1t[0]
+print(res) 
 # >>> (1, 1)
 
 # Comprobamos el rendimiento sobre entrenamiento y prueba:
-# >>> rendimiento(clas_pb1,X1e,y1e)
+res = rendimiento(clas_pb1,X1e,y1e)
+print("rendimiento") 
+
+print(res) 
+
 # 0.8733333333333333
 # >>> rendimiento(clas_pb1,X1t,y1t)
 # 0.83
 
-
+#%%
 # ----------------------------------------------------------------
 
 
