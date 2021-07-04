@@ -41,3 +41,21 @@ def cross_entropy_loss(pred, truth, correction_value=0.0001):
 def cross_entropy_gradient(pred, truth, X):
     # the gradient is with a minus, but we dont use to sum after instead of subtract
     return np.dot(truth-pred, X)
+
+# BEGIN >>> for digit data
+def converter(l):
+    aux = [0 if i == " " else 1 for i in l]
+    return aux
+
+def load_images(data_path):
+    data = np.loadtxt(data_path, dtype=str, delimiter='\n', comments='\n')
+    numeric_images = [converter(i) for i in data]
+    # print(numeric_images[0])
+    res = np.array(numeric_images, dtype=np.uint8)
+    ammount_data = len(numeric_images)/28
+    return res.reshape(int(ammount_data), 28*28)
+
+def load_labels(data_path):
+    data = np.loadtxt(data_path, dtype=np.int32, delimiter='\n')
+    return data
+# END >>> for digit data
