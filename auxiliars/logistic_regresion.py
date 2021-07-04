@@ -65,7 +65,7 @@ class RegresionLogisticaMiniBatch(BaseClassifier):
 
         print(preds)
         # TO REVIEW
-        return {c: np.sum(preds) for c in self.classes}
+        return {0:1-preds, 1:preds}
 
     @staticmethod
     def __init_W__(bias, X):
