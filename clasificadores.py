@@ -90,7 +90,7 @@
 # Si se llama a los metodos de clasificacion antes de entrenar el modelo, se
 # debe devolver (con raise) una excepcion:
 
-from math import e
+# from math import e
 import numpy as np
 import random
 
@@ -124,6 +124,7 @@ def rendimiento(clasificador, X, y, sklearn_clf=False):
     y = np.array(y)
 
     acc = (preds == y).sum()
+    
     return acc/len(y)
 
 # Ejemplo:
@@ -147,32 +148,135 @@ print(rendimiento(nb_tenis,X_tenis,y_tenis))
 # train_test_split de Scikit Learn, para separar el conjunto de test y/o
 # validacion. Ajustar tambien el valor del parametro de suavizado k. 
 
-# Mostrar el proceso realizado en cada caso, y los rendimientos obtenidos. 
+# Mostrar el proceso realizado en cada caso, y los rendimientos obtenidos.
+
+#%%
 from sklearn.model_selection import train_test_split
 
 
-def my_cross_validation(clf, X, y, cv, sklearn_clf=False):
-    scores = []
-    for i in range(cv):
+def my_cross_validation(clf, X, y, k = 5, sklearn_clf = False):
+    scores, local_score = [], []
+    
+    x_train = np.array_split(X,k)
+    y_train = np.array_split(y,k)
+
+    # Primera evaluación mediante k-Fold
+    for i in range(k):
+        x_fold_test = x_train.pop(0)
+        y_fold_test = y_train.pop(0)
+                
+        train_func = clf.fit if sklearn_clf else clf.entrena
+        
+        train_func(np.concatenate(x_train),np.concatenate(y_train))
+        
+        acc = rendimiento(clf, x_fold_test, y_fold_test, sklearn_clf=sklearn_clf)
+        print("Accuracy for fold {0} >>> {1}".format(i,acc))
+        local_score.append(acc)
+        
+        x_train.append(x_fold_test)
+        y_train.append(y_fold_test)
+        
+    scores.append(np.mean(local_score))
+    print("K-Fold mean accuracy >>> {0}".format(scores[0]))    
+    
+    # Segunda evaluación mediante aproximación
+    local_score = []
+
+    for i in range(k):
         x_train, x_test, y_train, y_test = train_test_split(X, y, random_state=random.randint(1, 10000), stratify=y)
 
         train_func = clf.fit if sklearn_clf else clf.entrena
         train_func(x_train, y_train)
 
         acc = rendimiento(clf, x_test, y_test, sklearn_clf=sklearn_clf)
-        scores.append(acc)
-    return scores
+        local_score.append(acc)
+        
+    scores.append(np.mean(local_score))
+    print("Random state mean accuracy >>> {0}".format(scores[1]))    
+    
+    return max(scores)
 
+def select_best_clf(x, y, k_max = 1, xy_raw = True):
+    best_k, best_acc = 0, 0
+    best_clf = ''
+    
+    if xy_raw:        
+        x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=random.randint(1, 10000), stratify=y)
+    else:
+        x_train, x_test, y_train, y_test = x[0], x[1], y[0], y[1]
 
-def select_best_clf(litsa):
-    # TODO >>> Manue
-    pass
+    for i in np.around(np.linspace(.5, k_max, k_max*2),1):
+        nb=NaiveBayes(k=1)
+        
+        acc = my_cross_validation(nb, x_train, y_train)
+        
+        print("Naive Bayes mean accuracy for iter with k {1} >>> {0}".format(acc,i))
+        print("-------------------------------------------------------------------")
 
+        if acc > best_acc:
+            best_acc = acc
+            best_clf = nb
+            best_k = i
 
-# do experiments with the three datasets
-# TODO >>> Manue  (si son demasiado largo, (que al ser varios conjuntos, puede ser), creo que quedaria mas claro en un archivo aparte)
-# (como funciones que despues se puede llamar aqui)
+    print("Best classifier accuracy with k {1} >>> {0}".format(best_acc,best_k))
 
+    acc_test = rendimiento(best_clf, x_test, y_test, sklearn_clf=False)
+    print("Chosen classifier evaluation >>> {0}".format(acc_test))
+
+    return best_clf
+
+#%%
+# - Votos de congresistas 
+from data.votos import datos as datos_votos, clasif as clasif_votos
+print("=============================================================================")
+print("Custom Naive Bayes classifier trained for votes dataset in progress...")
+print("=============================================================================")
+
+select_best_clf(datos_votos,clasif_votos)
+
+#%%
+# - Concesion de prestamos
+# Nota: dataset con erroes en el codigo que inclye, se corrige tras la importacion
+from data.credito import datos_con_la_clase as credito_raw
+X_credito=np.array([d[:-1] for d in credito_raw])
+y_credito=np.array([d[-1] for d in credito_raw])
+print("=============================================================================")
+print("Custom Naive Bayes classifier trained for credits dataset in progress...")
+print("=============================================================================")
+
+select_best_clf(X_credito,y_credito)
+
+#%%
+# - Criticas de peliculas en IMDB (ver NOTA con instrucciones para obtenerlo)
+import random as rd
+from sklearn.datasets import load_files
+reviews_train = load_files("data/aclImdb/train")
+muestra_entr=rd.sample(list(zip(reviews_train.data,
+                                    reviews_train.target)),k=2000)
+text_train=[d[0] for d in muestra_entr]
+text_train = [doc.replace(b"<br />", b" ") for doc in text_train]
+yimdb_train=np.array([d[1] for d in muestra_entr])
+reviews_test = load_files("data/aclImdb/test/")
+muestra_test=rd.sample(list(zip(reviews_test.data,
+                                        reviews_test.target)),k=400)
+text_test=[d[0] for d in muestra_test]
+text_test = [doc.replace(b"<br />", b" ") for doc in text_test]
+yimdb_test=np.array([d[1] for d in muestra_test])
+
+#%%
+from sklearn.feature_extraction.text import CountVectorizer
+
+vect = CountVectorizer(stop_words = "english", min_df=50, binary=True).fit(text_train)
+x_train = vect.transform(text_train).toarray()
+
+vect = CountVectorizer(stop_words = "english", min_df=50, binary=True).fit(text_test)
+x_test = vect.transform(text_test).toarray()
+print("=============================================================================")
+print("Custom Naive Bayes classifier trained for IMDB critics dataset in progress...")
+print("=============================================================================")
+
+select_best_clf([x_train, x_test],[yimdb_train, yimdb_test],xy_raw=False)
+#%%
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # NOTA:
@@ -255,6 +359,7 @@ def select_best_clf(litsa):
 #   situe. Eso aseguraria que el conjunto de datos fuera linealmente
 #   separable. Por ultimo, cambiar de clase a una proporcion pequena (dada por
 #   el parametro prop) del total de ejemplos
+#%%
 from auxiliars.utils import plot_1Ddata
 
 
@@ -281,7 +386,7 @@ def genera_conjunto_de_datos_c_l_s(rango,dim,n_datos,prop=0.1):
         plot_1Ddata(m, x, hs, y, rango)
 
     return x, y.astype(np.int)
-
+#%%
 
 # ---------------------------------------------
 # II.2) Implementacion de un clasificador lineal
@@ -391,7 +496,7 @@ def genera_conjunto_de_datos_c_l_s(rango,dim,n_datos,prop=0.1):
 # Ejemplo de uso (usando la funcion del apartado anterior para generar el
 # conjunto de datos). Probarlo con varios de estos conjuntos generados
 # aleatoriamente:
-
+#%%
 from auxiliars.logistic_regresion import RegresionLogisticaMiniBatch
 # -------------------------------------------------------------
 # >>> X1,y1=genera_conjunto_de_datos_c_l_s(4,8,400)
@@ -410,16 +515,21 @@ print("\n ++ Training on random data for Logistic Regresion ++ \n")
 clas_pb1.entrena(X1e, y1e, 100, bias=False)
 
 # Clasificamos un ejemplo de test, y lo comparamos con su clase real:
-# >>> clas_pb1.clasifica(X1t[0]),y1t[0]
+res = clas_pb1.clasifica(X1t[0]),y1t[0]
+print(res) 
 # >>> (1, 1)
 
 # Comprobamos el rendimiento sobre entrenamiento y prueba:
-# >>> rendimiento(clas_pb1,X1e,y1e)
+res = rendimiento(clas_pb1,X1e,y1e)
+print("rendimiento") 
+
+print(res) 
+
 # 0.8733333333333333
 # >>> rendimiento(clas_pb1,X1t,y1t)
 # 0.83
 
-
+#%%
 # ----------------------------------------------------------------
 
 

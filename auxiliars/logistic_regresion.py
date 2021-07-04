@@ -1,20 +1,21 @@
-from matplotlib.pyplot import axis
+ from matplotlib.pyplot import axis
 import numpy as np
 
 from auxiliars.base import BaseClassifier
 from auxiliars.utils import cross_entropy_gradient, cross_entropy_loss, sigmoid
-
+from scipy.special import expit
 
 class RegresionLogisticaMiniBatch(BaseClassifier):
 
     def __init__(self, clases=[0,1], normalizacion=False,
                 rate=0.1, rate_decay=False, batch_tam=64):
         super(BaseClassifier, self).__init__()
+        self.is_trained = False
         self.classes = np.arange(len(clases))
         self.class_names = clases
         self.batch_size = batch_tam
         self.rate = rate
-        
+
         self.W = None
         self.normalize_data = normalizacion
         self.rate_decay = rate_decay
@@ -55,12 +56,16 @@ class RegresionLogisticaMiniBatch(BaseClassifier):
                 batches += 1
                 # average loss per minibatch
                 running_loss += loss.sum()/len(x_b)
-            print("Average loss: {0:.4f}".format(running_loss/batches))
-
+                # print("Average loss: {0:.4f}".format(running_loss/batches))
+        self.is_trained = True
 
     def clasifica_prob(self,ejemplo):
-        # TODO Manue
-        pass
+        input_ = np.multiply(ejemplo, self.W)
+        preds = self.f_prediction(input_)
+
+        print(preds)
+        # TO REVIEW
+        return {0:1-preds, 1:preds}
 
     @staticmethod
     def __init_W__(bias, X):

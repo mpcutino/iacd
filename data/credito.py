@@ -18,7 +18,6 @@
 # Las variables X_credito,y_credito definidas al final contiene los datos en
 # formato adecuado para las implementaciones que se piden. 
 
-
 datos_con_la_clase=[['jubilado','ninguno','ninguna','uno','soltero','altos','estudiar'],
       ['funcionario','dos o más','ninguna','uno','viudo','bajos','no conceder'],
       ['parado','dos o más','dos o más','uno','divorciado','bajos','estudiar'],
@@ -672,5 +671,5 @@ datos_con_la_clase=[['jubilado','ninguno','ninguna','uno','soltero','altos','est
 
 
 
-X_credito=np.array([d[:-1] for d in credito.datos_con_la_clase])
-y_credito=np.array([d[-1] for d in credito.datos_con_la_clase])
+# X_credito=np.array([d[:-1] for d in credito.datos_con_la_clase])
+# y_credito=np.array([d[-1] for d in credito.datos_con_la_clase])
