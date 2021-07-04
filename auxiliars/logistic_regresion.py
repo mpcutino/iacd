@@ -69,5 +69,6 @@ class RegresionLogisticaMiniBatch(BaseClassifier):
             new_x = np.ones((X.shape[0], X.shape[1] + 1))
             new_x[:, 1:] = X
             X = new_x
-        W = np.random.rand(X.shape[1])
+        # inicializando con rango -1, 1
+        W = 2*np.random.rand(X.shape[1]) - 1
         return W, X

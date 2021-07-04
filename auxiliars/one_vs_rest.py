@@ -20,6 +20,7 @@ class RL_OvR():
             yi[~cond] = 0
             # train
             clf.entrena(X, yi, n_epochs, bias=False)
+            print(clf.W)
 
     def clasifica(self,ejemplo):
         pass
