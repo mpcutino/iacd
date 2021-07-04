@@ -7,14 +7,14 @@
 # --------------------------------------------------------------------------
 # Autores del trabajo:
 #
-# APELLIDOS: Manuel
-# NOMBRE: Fernandez
+# APELLIDOS: Fernandez
+# NOMBRE: Manuel Jesus
 #
 #
-# APELLIDOS: Miguel Angel
-# NOMBRE: Perez Cutino
-# TODO ->>> Cambiar tildes y n en los nombres. Puesto asi porque son 
-# caracteres raros y Vscode en Linux me esta dando el berro
+# APELLIDOS: Perez Cutino
+# NOMBRE: Miguel Angel
+# 
+#
 # ----------------------------------------------------------------------------
 
 
@@ -414,8 +414,6 @@ def genera_conjunto_de_datos_c_l_s(rango,dim,n_datos,prop=0.1):
 #     def clasifica(self,ejemplo):
                         
 #          ......
-
-### TODO >> en el archivo auxiliars/logistic_regresion.py
 
 # Explicamos a continuacion cada uno de estos elementos:
 
