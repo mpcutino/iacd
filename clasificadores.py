@@ -122,7 +122,6 @@ def rendimiento(clasificador, X, y, sklearn_clf=False):
 
     preds = np.array(preds)
     y = np.array(y)
-
     acc = (preds == y).sum()
     
     return acc/len(y)
@@ -275,7 +274,7 @@ print("=========================================================================
 print("Custom Naive Bayes classifier trained for IMDB critics dataset in progress...")
 print("=============================================================================")
 
-# select_best_clf([x_train, x_test],[yimdb_train, yimdb_test],xy_raw=False)
+select_best_clf([x_train, x_test],[yimdb_train, yimdb_test],xy_raw=False)
 #%%
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -560,12 +559,6 @@ print(rendimiento(lr_cancer,Xt_cancer,yt_cancer))
 
 # -----------------------------------------------------------------
 
-
-
-
-
-
-
 # -----------------------------------
 # II.3) Aplicando Regresion Logistica 
 # -----------------------------------
@@ -585,26 +578,115 @@ print(rendimiento(lr_cancer,Xt_cancer,yt_cancer))
 
 # Mostrar el proceso realizado en cada caso, y los rendimientos obtenidos. 
 
+#%%
+
+from sklearn.model_selection import train_test_split
+
+# Se evaluaran los clasificadores para diferentes tamanos de batch, rate y rate_decay. Ninguno de los dataset incluye los datos normalizados, por lo que se pasa a normalizar todos 
+def select_best_clf_regression(x, y, rate_max = 1, batch_size_to_eval = [32, 64, 128, 192, 256], norm=True):
+    best_config, best_acc = [], 0
+    best_clf = ''
+    
+    x_train, x_valid, y_train, y_valid = train_test_split(x, y, random_state=random.randint(1, 10000), stratify=y)
+
+    for batch in batch_size_to_eval:
+        for rate in np.around(np.linspace(0,rate_max,rate_max*10),1):
+            
+            nb = RegresionLogisticaMiniBatch(rate=rate, rate_decay=True, normalizacion=norm, batch_tam = batch)
+            nb.entrena(x_train, y_train, 500)
+            
+            acc_train = rendimiento(nb, x_train, y_train)
+            acc_valid = rendimiento(nb, x_valid, y_valid)
+    
+            print("Classifier accuracy with batch {0} rate {1} and rate_decay {2}".format(batch,rate,True))
+            print("Training dataset accuracy >>> {0}".format(acc_train))
+            print("Validation dataset accuracy >>> {0}".format(acc_valid))
+            print("-------------------------------------------------------------------")
+
+            if acc_test > best_acc:
+                best_acc = acc_valid
+                best_config = [batch,rate,True]
+                best_clf = nb
+
+                
+            nb = RegresionLogisticaMiniBatch(rate=rate, rate_decay=False, normalizacion=norm, batch_tam = batch)
+            nb.entrena(x_train, y_train, 500)
+            
+            acc_train_nodecay = rendimiento(nb, x_train, y_train)
+            acc_valid_nodecay  = rendimiento(nb, x_valid, y_valid)
+    
+            print("Classifier accuracy with batch {0} rate {1} and rate_decay {2}".format(batch,rate,False))
+            print("Training dataset accuracy >>> {0}".format(acc_train_nodecay))
+            print("Validation dataset accuracy >>> {0}".format(acc_valid_nodecay))
+            print("-------------------------------------------------------------------")
+            
+            if acc_test > best_acc:
+                best_acc = acc_valid
+                best_config = [batch,rate,False]
+                best_clf = nb
+
+    return best_clf,best_config
+
+#%%
+# - Votos de congresistas 
+from data.votos import datos as datos_votos, clasif as clasif_votos
+print("=============================================================================")
+print("Logistic regression classifier trained for votes dataset in progress...")
+print("=============================================================================")
+x_train, x_test, y_train, y_test = train_test_split(datos_votos,clasif_votos, random_state=random.randint(1, 10000), stratify=clasif_votos)
+clf,config = select_best_clf_regression(x_train,y_train)
+acc = rendimiento(clf, x_test, y_test, sklearn_clf=False)
+print("Best classifier accuracy with batch {0} rate {1} and rate_decay {2} >>> {3}".format(config[0],config[1],config[2],acc))
+
+#%%
+# - Cáncer de mama
+from sklearn.datasets import load_breast_cancer
+cancer=load_breast_cancer()
+X_cancer,y_cancer = cancer.data,cancer.target
+print("=============================================================================")
+print("Logistic regression classifier trained for breast cancer dataset in progress...")
+print("=============================================================================")
+x_train, x_test, y_train, y_test = train_test_split(X_cancer,y_cancer, random_state=random.randint(1, 10000), stratify=y_cancer)
+clf,config = select_best_clf_regression(x_train,y_train)
+acc = rendimiento(clf, x_test, y_test, sklearn_clf=False)
+print("Best classifier accuracy with batch {0} rate {1} and rate_decay {2} >>> {3}".format(config[0],config[1],config[2],acc))
+
+#%%
+# - Criticas de peliculas en IMDB (ver NOTA con instrucciones para obtenerlo)
+import random as rd
+from sklearn.datasets import load_files
+reviews_train = load_files("data/aclImdb/train")
+muestra_entr=rd.sample(list(zip(reviews_train.data,
+                                    reviews_train.target)),k=2000)
+text_train=[d[0] for d in muestra_entr]
+text_train = [doc.replace(b"<br />", b" ") for doc in text_train]
+yimdb_train=np.array([d[1] for d in muestra_entr])
+reviews_test = load_files("data/aclImdb/test/")
+muestra_test=rd.sample(list(zip(reviews_test.data,
+                                        reviews_test.target)),k=400)
+text_test=[d[0] for d in muestra_test]
+text_test = [doc.replace(b"<br />", b" ") for doc in text_test]
+yimdb_test=np.array([d[1] for d in muestra_test])
+
+#%%
+from sklearn.feature_extraction.text import CountVectorizer
+
+vect = CountVectorizer(stop_words = "english", min_df=50, binary=True).fit(text_train)
+x_train = vect.transform(text_train).toarray()
+x_test = vect.transform(text_test).toarray()
+
+print("=============================================================================")
+print("Logistic regression classifier trained for IMDB critics dataset in progress...")
+print("=============================================================================")
+clf,config = select_best_clf_regression(x_train, yimdb_train, norm=True)
+acc = rendimiento(clf, x_test, yimdb_test, sklearn_clf=False)
+print("Best classifier accuracy with batch {0} rate {1} and rate_decay {2} >>> {3}".format(config[0],config[1],config[2],acc))
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#%%
 # ===================================
 # PARTE III: CLASIFICACIoN MULTICLASE
 # ===================================
