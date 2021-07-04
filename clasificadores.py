@@ -601,7 +601,7 @@ def select_best_clf_regression(x, y, rate_max = 1, batch_size_to_eval = [32, 64,
             print("Validation dataset accuracy >>> {0}".format(acc_valid))
             print("-------------------------------------------------------------------")
 
-            if acc_test > best_acc:
+            if acc_valid > best_acc:
                 best_acc = acc_valid
                 best_config = [batch,rate,True]
                 best_clf = nb
@@ -618,7 +618,7 @@ def select_best_clf_regression(x, y, rate_max = 1, batch_size_to_eval = [32, 64,
             print("Validation dataset accuracy >>> {0}".format(acc_valid_nodecay))
             print("-------------------------------------------------------------------")
             
-            if acc_test > best_acc:
+            if acc_valid > best_acc:
                 best_acc = acc_valid
                 best_config = [batch,rate,False]
                 best_clf = nb
