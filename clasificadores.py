@@ -521,12 +521,10 @@ print(res)
 
 # Comprobamos el rendimiento sobre entrenamiento y prueba:
 res = rendimiento(clas_pb1,X1e,y1e)
-print("rendimiento") 
-
-print(res) 
-
+# print(res) 
 # 0.8733333333333333
-# >>> rendimiento(clas_pb1,X1t,y1t)
+res=rendimiento(clas_pb1,X1t,y1t)
+# print(res) 
 # 0.83
 
 #%%
@@ -623,7 +621,7 @@ print(rendimiento(lr_cancer,Xt_cancer,yt_cancer))
 #  En concreto, se pide implementar una clase python RL_OvR con la siguiente
 #  estructura, y que implemente un clasificador OvR usando como base el
 #  clasificador binario del apartado anterior.
-
+#%%
 from auxiliars.one_vs_rest import RL_OvR
 
 from sklearn.datasets import load_iris
@@ -660,6 +658,14 @@ print("\n ++ Training One vs Rest ++ \n")
 rl_iris = RL_OvR([0,1,2], rate=0.001, batch_tam=20)
 rl_iris.entrena(Xe_iris,ye_iris,n_epochs=100)
 
+res = rendimiento(rl_iris,Xe_iris,ye_iris)
+# print(res)
+# 0.9732142857142857
+
+res =rendimiento(rl_iris,Xt_iris,yt_iris)
+# print(res)
+# >>> 0.9736842105263158
+#%%
 # --------------------------------------------------------------------
 # >>> from sklearn.datasets import load_iris
 # >>> iris=load_iris()
