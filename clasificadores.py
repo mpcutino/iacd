@@ -247,6 +247,11 @@ select_best_clf(X_credito,y_credito)
 
 #%%
 # - Criticas de peliculas en IMDB (ver NOTA con instrucciones para obtenerlo)
+
+print("=============================================================================")
+print("Custom Naive Bayes classifier trained for IMDB critics dataset in progress...")
+print("=============================================================================")
+
 import random as rd
 from sklearn.datasets import load_files
 reviews_train = load_files("data/aclImdb/train")
@@ -270,9 +275,6 @@ x_train = vect.transform(text_train).toarray()
 
 vect = CountVectorizer(stop_words = "english", min_df=50, binary=True).fit(text_test)
 x_test = vect.transform(text_test).toarray()
-print("=============================================================================")
-print("Custom Naive Bayes classifier trained for IMDB critics dataset in progress...")
-print("=============================================================================")
 
 select_best_clf([x_train, x_test],[yimdb_train, yimdb_test],xy_raw=False)
 #%%
@@ -651,6 +653,10 @@ print("Best classifier accuracy with batch {0} rate {1} and rate_decay {2} >>> {
 
 #%%
 # - Criticas de peliculas en IMDB (ver NOTA con instrucciones para obtenerlo)
+print("=============================================================================")
+print("Logistic regression classifier trained for IMDB critics dataset in progress...")
+print("=============================================================================")
+
 import random as rd
 from sklearn.datasets import load_files
 reviews_train = load_files("data/aclImdb/train")
@@ -673,16 +679,9 @@ vect = CountVectorizer(stop_words = "english", min_df=50, binary=True).fit(text_
 x_train = vect.transform(text_train).toarray()
 x_test = vect.transform(text_test).toarray()
 
-print("=============================================================================")
-print("Logistic regression classifier trained for IMDB critics dataset in progress...")
-print("=============================================================================")
 clf,config = select_best_clf_regression(x_train, yimdb_train, norm=True)
 acc = rendimiento(clf, x_test, yimdb_test, sklearn_clf=False)
 print("Best classifier accuracy with batch {0} rate {1} and rate_decay {2} >>> {3}".format(config[0],config[1],config[2],acc))
-
-
-
-
 
 #%%
 # ===================================
