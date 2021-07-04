@@ -23,4 +23,14 @@ class RL_OvR():
             print(clf.W)
 
     def clasifica(self,ejemplo):
-        pass
+        res_comp, best_acc = [], []
+        best_acc, best_clf = 0, 0
+        for clf in self.classifiers:
+            res_comp.append(clf.clasifica_prob(ejemplo))
+
+        for clf_idx in range(len(res_comp)):
+            if res_comp[clf_idx][1] > best_acc:
+                best_acc = res_comp[clf_idx][1]
+                best_clf = clf_idx
+        
+        return best_clf
