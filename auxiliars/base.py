@@ -12,6 +12,9 @@ def not_trained_decorator(f):
 
 class BaseClassifier():
 
+    def __init__(self):
+        self.is_trained = False
+
     def entrena(self,X,y):
         pass
 
@@ -22,7 +25,7 @@ class BaseClassifier():
     @not_trained_decorator
     def clasifica(self,ejemplo):
         probs = self.clasifica_prob(ejemplo)
-
+        # print(probs)
         rc, rp = -1, -100000
         for c, p in probs.items():
             if p > rp:

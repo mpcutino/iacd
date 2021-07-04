@@ -9,8 +9,7 @@ from auxiliars.base import BaseClassifier
 class NaiveBayes(BaseClassifier):
 
     def __init__(self, k=1):
-        super(BaseClassifier, self).__init__()
-        self.is_trained = False
+        super(NaiveBayes, self).__init__()
         self.k = float(k)
 
         self.a_priori_probs = {}

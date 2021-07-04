@@ -89,7 +89,7 @@
 
 # Si se llama a los metodos de clasificacion antes de entrenar el modelo, se
 # debe devolver (con raise) una excepcion:
-
+#%%
 # from math import e
 import numpy as np
 import random
@@ -206,7 +206,7 @@ def select_best_clf(x, y, k_max = 1, xy_raw = True):
         x_train, x_test, y_train, y_test = x[0], x[1], y[0], y[1]
 
     for i in np.around(np.linspace(.5, k_max, k_max*2),1):
-        nb=NaiveBayes(k=1)
+        nb=NaiveBayes(k=i)
         
         acc = my_cross_validation(nb, x_train, y_train)
         
@@ -275,7 +275,7 @@ print("=========================================================================
 print("Custom Naive Bayes classifier trained for IMDB critics dataset in progress...")
 print("=============================================================================")
 
-select_best_clf([x_train, x_test],[yimdb_train, yimdb_test],xy_raw=False)
+# select_best_clf([x_train, x_test],[yimdb_train, yimdb_test],xy_raw=False)
 #%%
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -544,6 +544,7 @@ from sklearn.datasets import load_breast_cancer
 cancer=load_breast_cancer()
 # >>> X_cancer,y_cancer=cancer.data,cancer.target
 X_cancer,y_cancer = cancer.data,cancer.target
+
 Xe_cancer, Xt_cancer, ye_cancer, yt_cancer = train_test_split(X_cancer, y_cancer, random_state=42, stratify=y_cancer)
 
 # >>> lr_cancer=RegresionLogisticaMiniBatch(rate=0.1,rate_decay=True,normalizacion=True)
@@ -551,8 +552,11 @@ lr_cancer = RegresionLogisticaMiniBatch(rate=0.1,rate_decay=True,normalizacion=T
 # >>> lr_cancer.entrena(Xe_cancer,ye_cancer,10000)
 lr_cancer.entrena(Xe_cancer, ye_cancer, 10000, bias=False)
 
+print(rendimiento(lr_cancer,Xe_cancer,ye_cancer))
 # >>> rendimiento(lr_cancer,Xe_cancer,ye_cancer)
 # 0.9906103286384976
+
+print(rendimiento(lr_cancer,Xt_cancer,yt_cancer))
 # >>> rendimiento(lr_cancer,Xt_cancer,yt_cancer)
 # 0.972027972027972
 

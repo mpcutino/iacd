@@ -1,16 +1,14 @@
- from matplotlib.pyplot import axis
 import numpy as np
 
 from auxiliars.base import BaseClassifier
 from auxiliars.utils import cross_entropy_gradient, cross_entropy_loss, sigmoid
-from scipy.special import expit
+
 
 class RegresionLogisticaMiniBatch(BaseClassifier):
 
     def __init__(self, clases=[0,1], normalizacion=False,
                 rate=0.1, rate_decay=False, batch_tam=64):
-        super(BaseClassifier, self).__init__()
-        self.is_trained = False
+        super(RegresionLogisticaMiniBatch, self).__init__()
         self.classes = np.arange(len(clases))
         self.class_names = clases
         self.batch_size = batch_tam
@@ -19,6 +17,12 @@ class RegresionLogisticaMiniBatch(BaseClassifier):
         self.W = None
         self.normalize_data = normalizacion
         self.rate_decay = rate_decay
+
+        # normalization parameters
+        self.std_norm = None
+        self.mean_norm = None
+        # bias training
+        self.bias = False
 
         # training function (override this in child class to change the behaviour of the classifier)
         self.f_prediction = sigmoid
@@ -31,12 +35,14 @@ class RegresionLogisticaMiniBatch(BaseClassifier):
                 self.W = pesos_iniciales
             else:
                 self.W, X = self.__init_W__(bias, X)
+                self.bias = bias
         if self.normalize_data:
             # normalizar los datos de entrada X
             X = np.array(X)
-            std = np.std(X, axis=0)
-            std[std == 0] = 0.001   # to prevent a possible 0 division 
-            X = (X - np.mean(X, axis=0))/std
+            self.std_norm = np.std(X, axis=0)
+            self.std_norm[self.std_norm == 0] = 0.001   # to prevent a possible 0 division
+            self.mean_norm = np.mean(X, axis=0)
+            X = (X - self.mean_norm)/self.std_norm
 
         for n in range(n_epochs):
             running_loss = 0
@@ -60,11 +66,16 @@ class RegresionLogisticaMiniBatch(BaseClassifier):
         self.is_trained = True
 
     def clasifica_prob(self,ejemplo):
-        input_ = np.multiply(ejemplo, self.W)
+        if self.bias:
+            ejemplo = np.append(1, ejemplo)
+        
+        if self.normalize_data:
+            ejemplo = (np.array(ejemplo) - self.mean_norm)/self.std_norm
+
+        input_ = np.dot(ejemplo, self.W)
         preds = self.f_prediction(input_)
 
-        print(preds)
-        # TO REVIEW
+        # print(preds)
         return {0:1-preds, 1:preds}
 
     @staticmethod
